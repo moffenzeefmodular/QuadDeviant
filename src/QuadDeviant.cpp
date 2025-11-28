@@ -92,10 +92,10 @@ enum ParamId {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configSwitch(BUS1_PARAM, 0.f, 1.f, 0.f, "Bus 1");
 		configSwitch(BUS2_PARAM, 0.f, 1.f, 0.f, "Bus 2");
-		configParam(TOP4_PARAM, 0.f, 1.f, 0.f, "Top 4", "%", 0.f, 100.f);
-		configParam(TOP3_PARAM, 0.f, 1.f, 0.f, "Top 3", "%", 0.f, 100.f);
-		configParam(TOP2_PARAM, 0.f, 1.f, 0.f, "Top 2", "%", 0.f, 100.f);
-		configParam(TOP1_PARAM, 0.f, 1.f, 0.f, "Top 1", "%", 0.f, 100.f);
+		configParam(TOP4_PARAM, 0.f, 1.f, 1.f, "Top 4", "%", 0.f, 100.f);
+		configParam(TOP3_PARAM, 0.f, 1.f, 1.f, "Top 3", "%", 0.f, 100.f);
+		configParam(TOP2_PARAM, 0.f, 1.f, 1.f, "Top 2", "%", 0.f, 100.f);
+		configParam(TOP1_PARAM, 0.f, 1.f, 1.f, "Top 1", "%", 0.f, 100.f);
 		configSwitch(BUS3_PARAM, 0.f, 1.f, 0.f, "Bus 3");
 		configSwitch(BUS4_PARAM, 0.f, 1.f, 0.f, "Bus 4");
 		configParam(BOTTOM1_PARAM, 0.f, 1.f, 0.f, "Bottom 1", "%", 0.f, 100.f);
@@ -137,7 +137,21 @@ enum ParamId {
 
 // Bus Buttons
 dsp::SchmittTrigger busTrigger[4];
-bool busState[4] = {false, false, false, false};
+bool busState[4] = {true, true, true, };
+
+void onReset() override {
+    // Set all bus buttons to true
+    for (int i = 0; i < 4; i++) {
+        busState[i] = true;
+    }
+}
+
+void onRandomize() override {
+    for (int i = 0; i < 4; i++) {
+        busState[i] = (rand() % 2 == 0);
+    }
+}
+
 
 void process(const ProcessArgs &args) override {
 

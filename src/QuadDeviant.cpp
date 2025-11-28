@@ -1,22 +1,25 @@
 #include "plugin.hpp"
 
-
 struct QuadDeviant : Module {
-	enum ParamId {
-		TOP4_PARAM,
-		TOP3_PARAM,
-		TOP2_PARAM,
-		TOP1_PARAM,
-		BOTTOM1_PARAM,
-		BOTTOM2_PARAM,
-		BOTTOM3_PARAM,
-		BOTTOM4_PARAM,
-		RANGE1_PARAM,
-		RANGE2_PARAM,
-		RANGE3_PARAM,
-		RANGE4_PARAM,
-		PARAMS_LEN
-	};
+enum ParamId {
+    BUS1_PARAM,
+    BUS2_PARAM,
+    BUS3_PARAM,
+    BUS4_PARAM,
+    TOP1_PARAM,
+    TOP2_PARAM,
+    TOP3_PARAM,
+    TOP4_PARAM,
+    BOTTOM1_PARAM,
+    BOTTOM2_PARAM,
+    BOTTOM3_PARAM,
+    BOTTOM4_PARAM,
+    RANGE1_PARAM,
+    RANGE2_PARAM,
+    RANGE3_PARAM,
+    RANGE4_PARAM,
+    PARAMS_LEN
+};
 	enum InputId {
 		CLK1_INPUT,
 		CLK2_INPUT,
@@ -50,137 +53,246 @@ struct QuadDeviant : Module {
 		OUTPUTS_LEN
 	};
 	enum LightId {
-		LED1_LIGHT,
-		LED2_LIGHT,
-		LED3_LIGHT,
-		LED4_LIGHT,
-		SUMLED_LIGHT,
-		INVLED_LIGHT,
-		MAXLED_LIGHT,
-		MINLED_LIGHT,
-		POSLED_LIGHT,
-		NEGLED_LIGHT,
-		FULLLED_LIGHT,
-		INVFULLLED_LIGHT,
-		AVGLED_LIGHT,
-		SLEWLED_LIGHT,
+		LED1RED_LIGHT,
+		LED2RED_LIGHT,
+		LED3RED_LIGHT,
+		LED4RED_LIGHT,
+		SUMLEDRED_LIGHT,
+		INVLEDRED_LIGHT,
+		MAXLEDRED_LIGHT,
+		MINLEDRED_LIGHT,
+		POSLEDRED_LIGHT,
+		NEGLEDRED_LIGHT,
+		FULLLEDRED_LIGHT,
+		INVFULLLEDRED_LIGHT,
+		AVGLEDRED_LIGHT,
+		SLEWLEDRED_LIGHT,
+		LED1GREEN_LIGHT,
+		LED2GREEN_LIGHT,
+		LED3GREEN_LIGHT,
+		LED4GREEN_LIGHT,
+		SUMLEDGREEN_LIGHT,
+		INVLEDGREEN_LIGHT,
+		MAXLEDGREEN_LIGHT,
+		MINLEDGREEN_LIGHT,
+		POSLEDGREEN_LIGHT,
+		NEGLEDGREEN_LIGHT,
+		FULLLEDGREEN_LIGHT,
+		INVFULLLEDGREEN_LIGHT,
+		AVGLEDGREEN_LIGHT,
+		SLEWLEDGREEN_LIGHT,
+		BUS1LED_LIGHT,
+		BUS2LED_LIGHT,
+		BUS3LED_LIGHT,
+		BUS4LED_LIGHT,
 		LIGHTS_LEN
 	};
 
 	QuadDeviant() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(TOP4_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(TOP3_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(TOP2_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(TOP1_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(BOTTOM1_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(BOTTOM2_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(BOTTOM3_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(BOTTOM4_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(RANGE1_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(RANGE2_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(RANGE3_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(RANGE4_PARAM, 0.f, 1.f, 0.f, "");
-		configInput(CLK1_INPUT, "");
-		configInput(CLK2_INPUT, "");
-		configInput(CLK3_INPUT, "");
-		configInput(CLK4_INPUT, "");
-		configInput(TOPCV1_INPUT, "");
-		configInput(TOPCV2_INPUT, "");
-		configInput(TOPCV3_INPUT, "");
-		configInput(TOPCV4_INPUT, "");
-		configInput(BOTTOMCV1_INPUT, "");
-		configInput(BOTTOMCV2_INPUT, "");
-		configInput(BOTTOMCV3_INPUT, "");
-		configInput(BOTTOMCV4_INPUT, "");
-		configOutput(SUMOUT_OUTPUT, "");
-		configOutput(INVSUMOUT_OUTPUT, "");
-		configOutput(MAXOUT_OUTPUT, "");
-		configOutput(MINOUT_OUTPUT, "");
-		configOutput(POSOUT_OUTPUT, "");
-		configOutput(NEGOUT_OUTPUT, "");
-		configOutput(FULLOUT_OUTPUT, "");
-		configOutput(INVFULLOUT_OUTPUT, "");
-		configOutput(OUT1_OUTPUT, "");
-		configOutput(OUT2_OUTPUT, "");
-		configOutput(OUT3_OUTPUT, "");
-		configOutput(OUT4_OUTPUT, "");
-		configOutput(AVGOUT_OUTPUT, "");
-		configOutput(SLEWOUT_OUTPUT, "");
+		configSwitch(BUS1_PARAM, 0.f, 1.f, 0.f, "Bus 1");
+		configSwitch(BUS2_PARAM, 0.f, 1.f, 0.f, "Bus 2");
+		configParam(TOP4_PARAM, 0.f, 1.f, 0.f, "Top 4");
+		configParam(TOP3_PARAM, 0.f, 1.f, 0.f, "Top 3");
+		configParam(TOP2_PARAM, 0.f, 1.f, 0.f, "Top 2");
+		configParam(TOP1_PARAM, 0.f, 1.f, 0.f, "Top 1");
+		configSwitch(BUS3_PARAM, 0.f, 1.f, 0.f, "Bus 3");
+		configSwitch(BUS4_PARAM, 0.f, 1.f, 0.f, "Bus 4");
+		configParam(BOTTOM1_PARAM, 0.f, 1.f, 0.f, "Bottom 1");
+		configParam(BOTTOM2_PARAM, 0.f, 1.f, 0.f, "Bottom 2");
+		configParam(BOTTOM3_PARAM, 0.f, 1.f, 0.f, "Bottom 3");
+		configParam(BOTTOM4_PARAM, 0.f, 1.f, 0.f, "Bottom 4");
+		configSwitch(RANGE1_PARAM, 0.f, 2.f, 0.f, "Range 1", {"5vpp", "10vpp", "20vpp"});
+		configSwitch(RANGE2_PARAM, 0.f, 2.f, 0.f, "Range 2",  {"5vpp", "10vpp", "20vpp"});
+		configSwitch(RANGE3_PARAM, 0.f, 2.f, 0.f, "Range 3", {"5vpp", "10vpp", "20vpp"});
+		configSwitch(RANGE4_PARAM, 0.f, 2.f, 0.f, "Range 4", {"5vpp", "10vpp", "20vpp"});
+		configInput(CLK1_INPUT, "Clock 1");
+		configInput(CLK2_INPUT, "Clock 2");
+		configInput(CLK3_INPUT, "Clock 3");
+		configInput(CLK4_INPUT, "Clock 4");
+		configInput(TOPCV1_INPUT, "Top CV 1");
+		configInput(TOPCV2_INPUT, "Top CV 2");
+		configInput(TOPCV3_INPUT, "Top CV 3");
+		configInput(TOPCV4_INPUT, "Top CV 4");
+		configInput(BOTTOMCV1_INPUT, "Bottom CV 1");
+		configInput(BOTTOMCV2_INPUT, "Bottom CV 2");
+		configInput(BOTTOMCV3_INPUT, "Bottom CV 3");
+		configInput(BOTTOMCV4_INPUT, "Bottom CV 4");
+		configOutput(SUMOUT_OUTPUT, "Sum");
+		configOutput(INVSUMOUT_OUTPUT, "Inverse Sum");
+		configOutput(MAXOUT_OUTPUT, "Max");
+		configOutput(MINOUT_OUTPUT, "Min");
+		configOutput(POSOUT_OUTPUT, "Positive");
+		configOutput(NEGOUT_OUTPUT, "Negative");
+		configOutput(FULLOUT_OUTPUT, "Full Wave Rectified");
+		configOutput(INVFULLOUT_OUTPUT, "Inverse Full Wave Rectified");
+		configOutput(OUT1_OUTPUT, "Ch. 1");
+		configOutput(OUT2_OUTPUT, "Ch. 2");
+		configOutput(OUT3_OUTPUT, "Ch. 3");
+		configOutput(OUT4_OUTPUT, "Ch. 4");
+		configOutput(AVGOUT_OUTPUT, "Average");
+		configOutput(SLEWOUT_OUTPUT, "Slew");
 	}
 
-	void process(const ProcessArgs& args) override {
-	}
+
+// Bus Buttons
+dsp::SchmittTrigger busTrigger[4];
+bool busState[4] = {false, false, false, false};
+
+void process(const ProcessArgs &args) override {
+
+	//Bus buttons
+    for (int i = 0; i < 4; i++) {
+        int paramId = BUS1_PARAM + i;
+        int lightId = BUS1LED_LIGHT + i;
+
+        if (busTrigger[i].process(params[paramId].getValue())) {
+            busState[i] = !busState[i];
+        }
+
+        lights[lightId].setBrightnessSmooth(busState[i] ? 1.f : 0.f, args.sampleTime);
+    }
+}
+
 };
 
 
 struct QuadDeviantWidget : ModuleWidget {
+
+	    // Store pointers to ParamQuantities for dynamic labels
+    ParamQuantity* bus1Q = nullptr;
+    ParamQuantity* bus2Q = nullptr;
+    ParamQuantity* bus3Q = nullptr;
+    ParamQuantity* bus4Q = nullptr;
+
 	QuadDeviantWidget(QuadDeviant* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/panels/QuadDeviant.svg")));
 
-		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.019, 25.23)), module, QuadDeviant::TOP4_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(32.685, 25.23)), module, QuadDeviant::TOP3_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(55.352, 25.23)), module, QuadDeviant::TOP2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(78.019, 25.23)), module, QuadDeviant::TOP1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.019, 45.608)), module, QuadDeviant::BOTTOM1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(32.685, 45.608)), module, QuadDeviant::BOTTOM2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(55.352, 45.608)), module, QuadDeviant::BOTTOM3_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(78.019, 45.608)), module, QuadDeviant::BOTTOM4_PARAM));
+		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(108.324, 18.277)), module, QuadDeviant::BUS1_PARAM, QuadDeviant::BUS1LED_LIGHT));
+		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(121.633, 18.308)), module, QuadDeviant::BUS2_PARAM, QuadDeviant::BUS2LED_LIGHT));
+		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(108.324, 30.54)), module, QuadDeviant::BUS3_PARAM, QuadDeviant::BUS3LED_LIGHT));
+		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(121.633, 30.531)), module, QuadDeviant::BUS4_PARAM, QuadDeviant::BUS4LED_LIGHT));
 
-		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(10.019, 61.826)), module, QuadDeviant::RANGE1_PARAM));
-		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(32.685, 61.826)), module, QuadDeviant::RANGE2_PARAM));
-		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(55.352, 61.826)), module, QuadDeviant::RANGE3_PARAM));
-		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(78.019, 61.826)), module, QuadDeviant::RANGE4_PARAM));
+		//addParam(createParamCentered<LEDBezel>(mm2px(Vec(121.633, 18.308)), module, QuadDeviant::BUS2_PARAM));
+		//addParam(createParamCentered<LEDBezel>(mm2px(Vec(108.324, 30.54)), module, QuadDeviant::BUS3_PARAM));
+		//addParam(createParamCentered<LEDBezel>(mm2px(Vec(121.633, 30.531)), module, QuadDeviant::BUS4_PARAM));
+    
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.664, 25.23)), module, QuadDeviant::TOP1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(39.664, 25.23)), module, QuadDeviant::TOP2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(64.664, 25.23)), module, QuadDeviant::TOP3_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(89.664, 25.23)), module, QuadDeviant::TOP4_PARAM));
+	
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.664, 45.608)), module, QuadDeviant::BOTTOM1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(39.664, 45.608)), module, QuadDeviant::BOTTOM2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(64.664, 45.608)), module, QuadDeviant::BOTTOM3_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(89.664, 45.608)), module, QuadDeviant::BOTTOM4_PARAM));
 
-		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(10.019, 76.014)), module, QuadDeviant::CLK1_INPUT));
-		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(32.685, 75.929)), module, QuadDeviant::CLK2_INPUT));
-		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(55.352, 75.929)), module, QuadDeviant::CLK3_INPUT));
-		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(78.019, 75.929)), module, QuadDeviant::CLK4_INPUT));
-		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(10.019, 88.876)), module, QuadDeviant::TOPCV1_INPUT));
-		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(32.685, 88.876)), module, QuadDeviant::TOPCV2_INPUT));
-		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(55.352, 88.876)), module, QuadDeviant::TOPCV3_INPUT));
-		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(78.019, 88.876)), module, QuadDeviant::TOPCV4_INPUT));
-		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(10.019, 101.449)), module, QuadDeviant::BOTTOMCV1_INPUT));
-		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(32.685, 101.449)), module, QuadDeviant::BOTTOMCV2_INPUT));
-		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(55.352, 101.449)), module, QuadDeviant::BOTTOMCV3_INPUT));
-		addInput(createInputCentered<ThemedPJ301MPort>(mm2px(Vec(78.019, 101.449)), module, QuadDeviant::BOTTOMCV4_INPUT));
+		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(14.664, 61.826)), module, QuadDeviant::RANGE1_PARAM));
+		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(39.664, 61.826)), module, QuadDeviant::RANGE2_PARAM));
+		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(64.664, 61.826)), module, QuadDeviant::RANGE3_PARAM));
+		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(89.664, 61.826)), module, QuadDeviant::RANGE4_PARAM));
 
-		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(92.449, 22.129)), module, QuadDeviant::SUMOUT_OUTPUT));
-		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(104.171, 22.135)), module, QuadDeviant::INVSUMOUT_OUTPUT));
-		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(92.449, 45.026)), module, QuadDeviant::MAXOUT_OUTPUT));
-		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(104.171, 44.973)), module, QuadDeviant::MINOUT_OUTPUT));
-		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(92.449, 67.847)), module, QuadDeviant::POSOUT_OUTPUT));
-		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(104.171, 67.811)), module, QuadDeviant::NEGOUT_OUTPUT));
-		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(92.449, 90.743)), module, QuadDeviant::FULLOUT_OUTPUT));
-		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(104.171, 90.726)), module, QuadDeviant::INVFULLOUT_OUTPUT));
-		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(10.019, 113.602)), module, QuadDeviant::OUT1_OUTPUT));
-		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(32.685, 113.602)), module, QuadDeviant::OUT2_OUTPUT));
-		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(55.352, 113.602)), module, QuadDeviant::OUT3_OUTPUT));
-		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(78.019, 113.602)), module, QuadDeviant::OUT4_OUTPUT));
-		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(92.449, 113.602)), module, QuadDeviant::AVGOUT_OUTPUT));
-		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(104.171, 113.602)), module, QuadDeviant::SLEWOUT_OUTPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.664, 76.014)), module, QuadDeviant::CLK1_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.664, 75.929)), module, QuadDeviant::CLK2_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(64.664, 75.929)), module, QuadDeviant::CLK3_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(89.664, 75.929)), module, QuadDeviant::CLK4_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.664, 88.876)), module, QuadDeviant::TOPCV1_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.664, 88.876)), module, QuadDeviant::TOPCV2_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(64.664, 88.876)), module, QuadDeviant::TOPCV3_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(89.664, 88.876)), module, QuadDeviant::TOPCV4_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.664, 101.449)), module, QuadDeviant::BOTTOMCV1_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.664, 101.449)), module, QuadDeviant::BOTTOMCV2_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(64.664, 101.449)), module, QuadDeviant::BOTTOMCV3_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(89.664, 101.449)), module, QuadDeviant::BOTTOMCV4_INPUT));
 
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(10.019, 14.029)), module, QuadDeviant::LED1_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(32.685, 14.029)), module, QuadDeviant::LED2_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(55.352, 14.029)), module, QuadDeviant::LED3_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(78.019, 14.029)), module, QuadDeviant::LED4_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(92.449, 14.029)), module, QuadDeviant::SUMLED_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(104.171, 14.029)), module, QuadDeviant::INVLED_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(92.449, 36.926)), module, QuadDeviant::MAXLED_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(104.171, 36.867)), module, QuadDeviant::MINLED_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(92.449, 59.747)), module, QuadDeviant::POSLED_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(104.171, 59.705)), module, QuadDeviant::NEGLED_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(92.449, 82.643)), module, QuadDeviant::FULLLED_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(104.171, 82.62)), module, QuadDeviant::INVFULLLED_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(92.449, 105.502)), module, QuadDeviant::AVGLED_LIGHT));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(104.171, 105.496)), module, QuadDeviant::SLEWLED_LIGHT));
-	}
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(108.324, 44.897)), module, QuadDeviant::SUMOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(121.633, 44.9)), module, QuadDeviant::INVSUMOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(108.324, 62.102)), module, QuadDeviant::MAXOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(121.633, 62.047)), module, QuadDeviant::MINOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(108.324, 79.23)), module, QuadDeviant::POSOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(121.633, 79.194)), module, QuadDeviant::NEGOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(108.324, 96.435)), module, QuadDeviant::FULLOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(121.633, 96.417)), module, QuadDeviant::INVFULLOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(14.664, 113.602)), module, QuadDeviant::OUT1_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(39.664, 113.602)), module, QuadDeviant::OUT2_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(64.664, 113.602)), module, QuadDeviant::OUT3_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(89.664, 113.602)), module, QuadDeviant::OUT4_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(108.324, 113.602)), module, QuadDeviant::AVGOUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(121.633, 113.602)), module, QuadDeviant::SLEWOUT_OUTPUT));
+
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(14.664, 14.029)), module, QuadDeviant::LED1RED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(14.664, 14.029)), module, QuadDeviant::LED1GREEN_LIGHT));
+
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(39.664, 14.029)), module, QuadDeviant::LED2RED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(39.664, 14.029)), module, QuadDeviant::LED2GREEN_LIGHT));
+
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(64.664, 14.029)), module, QuadDeviant::LED3RED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(64.664, 14.029)), module, QuadDeviant::LED3GREEN_LIGHT));
+
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(89.664, 14.029)), module, QuadDeviant::LED4RED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(89.664, 14.029)), module, QuadDeviant::LED4GREEN_LIGHT));
+
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(108.324, 38.165)), module, QuadDeviant::SUMLEDRED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(108.324, 38.165)), module, QuadDeviant::SUMLEDGREEN_LIGHT));
+
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(121.633, 38.162)), module, QuadDeviant::INVLEDRED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(121.633, 38.162)), module, QuadDeviant::INVLEDGREEN_LIGHT));
+
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(108.324, 54.841)), module, QuadDeviant::MAXLEDRED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(108.324, 54.841)), module, QuadDeviant::MAXLEDGREEN_LIGHT));
+
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(121.633, 54.78)), module, QuadDeviant::MINLEDRED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(121.633, 54.78)), module, QuadDeviant::MINLEDGREEN_LIGHT));
+
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(108.324, 71.969)), module, QuadDeviant::POSLEDRED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(108.324, 71.969)), module, QuadDeviant::POSLEDGREEN_LIGHT));
+
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(121.633, 71.927)), module, QuadDeviant::NEGLEDRED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(121.633, 71.927)), module, QuadDeviant::NEGLEDGREEN_LIGHT));
+
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(108.324, 89.174)), module, QuadDeviant::FULLLEDRED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(108.324, 89.174)), module, QuadDeviant::FULLLEDGREEN_LIGHT));
+
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(121.633, 89.15)), module, QuadDeviant::INVFULLLEDRED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(121.633, 89.15)), module, QuadDeviant::INVFULLLEDGREEN_LIGHT));
+
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(108.324, 106.341)), module, QuadDeviant::AVGLEDRED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(108.324, 106.341)), module, QuadDeviant::AVGLEDGREEN_LIGHT));
+
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(121.633, 106.335)), module, QuadDeviant::SLEWLEDRED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(121.633, 106.335)), module, QuadDeviant::SLEWLEDGREEN_LIGHT));
+
+  if (module) {
+            bus1Q = module->paramQuantities[QuadDeviant::BUS1_PARAM];
+            bus2Q = module->paramQuantities[QuadDeviant::BUS2_PARAM];
+            bus3Q = module->paramQuantities[QuadDeviant::BUS3_PARAM];
+            bus4Q = module->paramQuantities[QuadDeviant::BUS4_PARAM];
+        }
+    }
+
+   void step() override {
+        ModuleWidget::step();
+
+        if (!module) return;
+        auto* m = dynamic_cast<QuadDeviant*>(module);
+
+        ParamQuantity* qs[4] = {bus1Q, bus2Q, bus3Q, bus4Q};
+
+        // 🔥 Loop through channels for dynamic labeling
+        for (int i = 0; i < 4; i++) {
+            if (qs[i]) {
+                qs[i]->name = m->busState[i]
+                    ? ("Ch. " + std::to_string(i + 1) + " (ON)")
+                    : ("Ch. " + std::to_string(i + 1) + " (OFF)");
+            }
+        }
+    }
 };
 
 

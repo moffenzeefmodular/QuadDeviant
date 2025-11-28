@@ -137,7 +137,7 @@ enum ParamId {
 
 // Bus Buttons
 dsp::SchmittTrigger busTrigger[4];
-bool busState[4] = {true, true, true, };
+bool busState[4] = {true, true, true,  true};
 
 void onReset() override {
     // Set all bus buttons to true
@@ -192,10 +192,6 @@ struct QuadDeviantWidget : ModuleWidget {
 		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(121.633, 18.308)), module, QuadDeviant::BUS2_PARAM, QuadDeviant::BUS2LED_LIGHT));
 		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(108.324, 30.54)), module, QuadDeviant::BUS3_PARAM, QuadDeviant::BUS3LED_LIGHT));
 		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(121.633, 30.531)), module, QuadDeviant::BUS4_PARAM, QuadDeviant::BUS4LED_LIGHT));
-
-		//addParam(createParamCentered<LEDBezel>(mm2px(Vec(121.633, 18.308)), module, QuadDeviant::BUS2_PARAM));
-		//addParam(createParamCentered<LEDBezel>(mm2px(Vec(108.324, 30.54)), module, QuadDeviant::BUS3_PARAM));
-		//addParam(createParamCentered<LEDBezel>(mm2px(Vec(121.633, 30.531)), module, QuadDeviant::BUS4_PARAM));
     
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.664, 25.23)), module, QuadDeviant::TOP1_PARAM));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(39.664, 25.23)), module, QuadDeviant::TOP2_PARAM));

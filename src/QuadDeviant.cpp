@@ -174,6 +174,10 @@ bool busState[4] = {true, true, true, true};
 float lastBang[4] = {0.f, 0.f, 0.f, 0.f};
 float randomVoltage[4] = {0.01f, 0.01f, 0.01f, 0.01f};
 
+float slewVoltage = 0.f;           // Last slew output
+const float slewRate = 0.0001f;       // Max volts per sample (adjust for speed)
+
+
 // Rescale helper: 0-1 param -> -5V to 5V
 float paramToVoltage(float p) {
     return -5.f + p * 10.f;
@@ -266,6 +270,8 @@ void process(const ProcessArgs &args) override {
         }
     }
 
+	/////// CV BUS /////////
+
     // --- SUM output after all channels processed ---
     float sumVoltage = 0.f;
     for (int i = 0; i < 4; i++) {
@@ -276,6 +282,101 @@ void process(const ProcessArgs &args) override {
 	lights[SUMLEDRED_LIGHT].setBrightness(std::max(-sumVoltage / 10.f, 0.f));
 	lights[SUMLEDGREEN_LIGHT].setBrightness(std::max(sumVoltage / 10.f, 0.f));
 
+
+	// --- INVERSE SUM output ---
+	float invSum = -sumVoltage;
+	outputs[INVSUMOUT_OUTPUT].setVoltage(invSum);
+	lights[INVLEDRED_LIGHT].setBrightness(std::max(-invSum / 10.f, 0.f));
+	lights[INVLEDGREEN_LIGHT].setBrightness(std::max(invSum / 10.f, 0.f));
+
+	// --- MAX output (respect bus mutes) ---
+	bool hasActiveChannel = false;
+	float maxVoltage = -10.f;  // start from lowest possible
+
+	for (int i = 0; i < 4; i++) {
+	    if (busState[i]) {  // only include channels that are not muted
+	        if (!hasActiveChannel || randomVoltage[i] > maxVoltage) {
+	            maxVoltage = randomVoltage[i];
+	            hasActiveChannel = true;
+	        }
+	    }
+	}
+
+	// If no channels are active, output 0
+	if (!hasActiveChannel) maxVoltage = 0.f;
+
+	// Clamp and set output
+	maxVoltage = clamp(maxVoltage, -10.f, 10.f);
+	outputs[MAXOUT_OUTPUT].setVoltage(maxVoltage);
+	lights[MAXLEDRED_LIGHT].setBrightness(std::max(-maxVoltage / 10.f, 0.f));   // Red = negative
+	lights[MAXLEDGREEN_LIGHT].setBrightness(std::max(maxVoltage / 10.f, 0.f));    // Green = positive
+
+	// --- MIN output (respect bus mutes) ---
+	hasActiveChannel = false;
+	float minVoltage = 10.f;  // start from highest possible
+
+	for (int i = 0; i < 4; i++) {
+	    if (busState[i]) {  // only include channels that are not muted
+	        if (!hasActiveChannel || randomVoltage[i] < minVoltage) {
+	            minVoltage = randomVoltage[i];
+	            hasActiveChannel = true;
+	        }
+	    }
+	}
+
+	// If no channels are active, output 0
+	if (!hasActiveChannel) minVoltage = 0.f;
+
+	// Clamp and set output
+	minVoltage = clamp(minVoltage, -10.f, 10.f);
+	outputs[MINOUT_OUTPUT].setVoltage(minVoltage);
+	lights[MINLEDRED_LIGHT].setBrightness(std::max(-minVoltage / 10.f, 0.f));   // Red = negative
+	lights[MINLEDGREEN_LIGHT].setBrightness(std::max(minVoltage / 10.f, 0.f));   // Green = positive
+
+	// --- POS output (half-wave of sum) ---
+	float posVoltage = std::max(sumVoltage, 0.f);  // only positive part
+	outputs[POSOUT_OUTPUT].setVoltage(posVoltage);
+	lights[POSLEDGREEN_LIGHT].setBrightness(std::min(posVoltage / 10.f, 1.f));  // green = positive
+
+	// --- NEG output (half-wave negative of sum) ---
+	float negVoltage = std::min(sumVoltage, 0.f);  // only negative part
+	outputs[NEGOUT_OUTPUT].setVoltage(negVoltage);
+	lights[NEGLEDRED_LIGHT].setBrightness(std::min(-negVoltage / 10.f, 1.f)); // red = negative
+
+	float fullVoltage = std::abs(sumVoltage);
+	outputs[FULLOUT_OUTPUT].setVoltage(fullVoltage);
+	lights[FULLLEDGREEN_LIGHT].setBrightness(fullVoltage / 10.f); // green = positive
+
+	// --- INVERSE FULL output (inverted full-wave of sum) ---
+	float invFullVoltage = -std::abs(sumVoltage);
+	outputs[INVFULLOUT_OUTPUT].setVoltage(invFullVoltage);
+	lights[INVFULLLEDRED_LIGHT].setBrightness(std::max(-invFullVoltage / 10.f, 0.f));   // Red = negative
+	lights[INVFULLLEDGREEN_LIGHT].setBrightness(std::max(invFullVoltage / 10.f, 0.f)); // Green = positive (should be 0)
+
+	// --- AVG output (average of active channels) ---
+	float sumActive = 0.f;
+	int countActive = 0;
+	for (int i = 0; i < 4; i++) {
+	    if (busState[i]) {          // only include active channels
+	        sumActive += randomVoltage[i];
+	        countActive++;
+	    }
+	}
+	float avgVoltage = (countActive > 0) ? (sumActive / countActive) : 0.f;
+	avgVoltage = clamp(avgVoltage, -10.f, 10.f);
+	outputs[AVGOUT_OUTPUT].setVoltage(avgVoltage);
+	lights[AVGLEDRED_LIGHT].setBrightness(std::max(-avgVoltage / 10.f, 0.f));   // Red = negative
+	lights[AVGLEDGREEN_LIGHT].setBrightness(std::max(avgVoltage / 10.f, 0.f));  // Green = positive
+
+	// --- SLEW output (SUM voltage passed through fixed slew) ---
+	float delta = sumVoltage - slewVoltage;
+	if (delta > slewRate) delta = slewRate;
+	if (delta < -slewRate) delta = -slewRate;
+	slewVoltage += delta;
+
+	outputs[SLEWOUT_OUTPUT].setVoltage(clamp(slewVoltage, -10.f, 10.f));
+	lights[SLEWLEDRED_LIGHT].setBrightnessSmooth(std::max(-slewVoltage / 10.f, 0.f), args.sampleTime);
+	lights[SLEWLEDGREEN_LIGHT].setBrightnessSmooth(std::max(slewVoltage / 10.f, 0.f), args.sampleTime);
 }
 };
 

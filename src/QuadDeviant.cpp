@@ -223,36 +223,31 @@ void process(const ProcessArgs &args) override {
         if (busTrigger[i].process(params[BUS1_PARAM + i].getValue()))
             busState[i] = !busState[i];
 
+        // Only button LEDs light up immediately
         lights[BUS1LED_LIGHT + i].setBrightness(busState[i] ? 1.f : 0.f);
     }
-
-    float sumVoltage = 0.f;
 
     // --- Clock normalization cascade ---
     float normalizedClocks[4];
     bool hasClock = false;
-
     for (int i = 0; i < 4; i++) {
         if (inputs[CLK1_INPUT + i].isConnected()) {
             normalizedClocks[i] = inputs[CLK1_INPUT + i].getVoltage();
             hasClock = true;
         } else if (hasClock) {
-            // Normalize from the last connected upstream clock
             normalizedClocks[i] = normalizedClocks[i - 1];
         } else {
-            normalizedClocks[i] = 0.f; // no clock connected upstream
+            normalizedClocks[i] = 0.f;
         }
     }
 
     // --- Channel processing ---
     for (int i = 0; i < 4; i++) {
-        bool bangTriggered = false;
-        float v = normalizedClocks[i];
-
-        bangTriggered = (v > 0.5f && lastBang[i] <= 0.5f);
-        lastBang[i] = v;
+        bool bangTriggered = (normalizedClocks[i] > 0.5f && lastBang[i] <= 0.5f);
+        lastBang[i] = normalizedClocks[i];
 
         if (bangTriggered) {
+            // Compute channel voltage
             float topValue    = paramToVoltage(params[TOP1_PARAM + i].getValue()) + inputs[TOPCV1_INPUT + i].getVoltage();
             float bottomValue = paramToVoltage(params[BOTTOM1_PARAM + i].getValue()) + inputs[BOTTOMCV1_INPUT + i].getVoltage();
             if (bottomValue >= topValue) bottomValue = topValue;
@@ -260,15 +255,27 @@ void process(const ProcessArgs &args) override {
             float rawVoltage = clamp(bottomValue + (topValue - bottomValue) * random::uniform(), -5.f, 5.f);
             randomVoltage[i] = rangeScale(rawVoltage, params[RANGE1_PARAM + i].getValue());
 
-            // --- Set CV output ---
+            // --- Channel output always active ---
             outputs[OUT1_OUTPUT + i].setVoltage(randomVoltage[i]);
 
-            // --- Rectified LEDs ---
+            // --- Rectified channel LEDs ---
             int ledBase = LED1RED_LIGHT + i * 2;
-            lights[ledBase].setBrightness(std::max(-randomVoltage[i] / (rangeScale(10.f, params[RANGE1_PARAM + i].getValue())), 0.f));
-            lights[ledBase + 1].setBrightness(std::max(randomVoltage[i] / (rangeScale(10.f, params[RANGE1_PARAM + i].getValue())), 0.f));
+            float maxRange = rangeScale(10.f, params[RANGE1_PARAM + i].getValue());
+            lights[ledBase].setBrightness(std::max(-randomVoltage[i] / maxRange, 0.f));       // red = negative
+            lights[ledBase + 1].setBrightness(std::max(randomVoltage[i] / maxRange, 0.f));    // green = positive
         }
     }
+
+    // --- SUM output after all channels processed ---
+    float sumVoltage = 0.f;
+    for (int i = 0; i < 4; i++) {
+        // Only include channels that are not muted
+	sumVoltage += busState[i] ? randomVoltage[i] : 0.f;
+    }
+    outputs[SUMOUT_OUTPUT].setVoltage(clamp(sumVoltage, -10.f, 10.f));
+	lights[SUMLEDRED_LIGHT].setBrightness(std::max(-sumVoltage / 10.f, 0.f));
+	lights[SUMLEDGREEN_LIGHT].setBrightness(std::max(sumVoltage / 10.f, 0.f));
+
 }
 };
 

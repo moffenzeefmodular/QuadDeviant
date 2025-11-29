@@ -1,222 +1,242 @@
 #include "plugin.hpp"
 
 struct QuadDeviant : Module {
-enum ParamId {
-    BUS1_PARAM,
-    BUS2_PARAM,
-    BUS3_PARAM,
-    BUS4_PARAM,
-    TOP1_PARAM,
-    TOP2_PARAM,
-    TOP3_PARAM,
-    TOP4_PARAM,
-    BOTTOM1_PARAM,
-    BOTTOM2_PARAM,
-    BOTTOM3_PARAM,
-    BOTTOM4_PARAM,
-    RANGE1_PARAM,
-    RANGE2_PARAM,
-    RANGE3_PARAM,
-    RANGE4_PARAM,
-    PARAMS_LEN
-};
-	enum InputId {
-		CLK1_INPUT,
-		CLK2_INPUT,
-		CLK3_INPUT,
-		CLK4_INPUT,
-		TOPCV1_INPUT,
-		TOPCV2_INPUT,
-		TOPCV3_INPUT,
-		TOPCV4_INPUT,
-		BOTTOMCV1_INPUT,
-		BOTTOMCV2_INPUT,
-		BOTTOMCV3_INPUT,
-		BOTTOMCV4_INPUT,
-		INPUTS_LEN
-	};
-	enum OutputId {
-		SUMOUT_OUTPUT,
-		INVSUMOUT_OUTPUT,
-		MAXOUT_OUTPUT,
-		MINOUT_OUTPUT,
-		POSOUT_OUTPUT,
-		NEGOUT_OUTPUT,
-		FULLOUT_OUTPUT,
-		INVFULLOUT_OUTPUT,
-		OUT1_OUTPUT,
-		OUT2_OUTPUT,
-		OUT3_OUTPUT,
-		OUT4_OUTPUT,
-		AVGOUT_OUTPUT,
-		SLEWOUT_OUTPUT,
-		OUTPUTS_LEN
-	};
-	enum LightId {
-		LED1RED_LIGHT,
-		LED2RED_LIGHT,
-		LED3RED_LIGHT,
-		LED4RED_LIGHT,
-		SUMLEDRED_LIGHT,
-		INVLEDRED_LIGHT,
-		MAXLEDRED_LIGHT,
-		MINLEDRED_LIGHT,
-		POSLEDRED_LIGHT,
-		NEGLEDRED_LIGHT,
-		FULLLEDRED_LIGHT,
-		INVFULLLEDRED_LIGHT,
-		AVGLEDRED_LIGHT,
-		SLEWLEDRED_LIGHT,
-		LED1GREEN_LIGHT,
-		LED2GREEN_LIGHT,
-		LED3GREEN_LIGHT,
-		LED4GREEN_LIGHT,
-		SUMLEDGREEN_LIGHT,
-		INVLEDGREEN_LIGHT,
-		MAXLEDGREEN_LIGHT,
-		MINLEDGREEN_LIGHT,
-		POSLEDGREEN_LIGHT,
-		NEGLEDGREEN_LIGHT,
-		FULLLEDGREEN_LIGHT,
-		INVFULLLEDGREEN_LIGHT,
-		AVGLEDGREEN_LIGHT,
-		SLEWLEDGREEN_LIGHT,
-		BUS1LED_LIGHT,
-		BUS2LED_LIGHT,
-		BUS3LED_LIGHT,
-		BUS4LED_LIGHT,
-		LIGHTS_LEN
-	};
+    enum ParamId {
+        // Bus switches
+        BUS1_PARAM,
+        BUS2_PARAM,
+        BUS3_PARAM,
+        BUS4_PARAM,
+        // Top knobs
+        TOP1_PARAM,
+        TOP2_PARAM,
+        TOP3_PARAM,
+        TOP4_PARAM,
+        // Bottom knobs
+        BOTTOM1_PARAM,
+        BOTTOM2_PARAM,
+        BOTTOM3_PARAM,
+        BOTTOM4_PARAM,
+        // Range switches
+        RANGE1_PARAM,
+        RANGE2_PARAM,
+        RANGE3_PARAM,
+        RANGE4_PARAM,
+        PARAMS_LEN
+    };
 
-	QuadDeviant() {
-		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configSwitch(BUS1_PARAM, 0.f, 1.f, 0.f, "Bus 1");
-		configSwitch(BUS2_PARAM, 0.f, 1.f, 0.f, "Bus 2");
-		configParam(TOP4_PARAM, 0.f, 1.f, 1.f, "Top 4", "%", 0.f, 100.f);
-		configParam(TOP3_PARAM, 0.f, 1.f, 1.f, "Top 3", "%", 0.f, 100.f);
-		configParam(TOP2_PARAM, 0.f, 1.f, 1.f, "Top 2", "%", 0.f, 100.f);
-		configParam(TOP1_PARAM, 0.f, 1.f, 1.f, "Top 1", "%", 0.f, 100.f);
-		configSwitch(BUS3_PARAM, 0.f, 1.f, 0.f, "Bus 3");
-		configSwitch(BUS4_PARAM, 0.f, 1.f, 0.f, "Bus 4");
-		configParam(BOTTOM1_PARAM, 0.f, 1.f, 0.f, "Bottom 1", "%", 0.f, 100.f);
-		configParam(BOTTOM2_PARAM, 0.f, 1.f, 0.f, "Bottom 2", "%", 0.f, 100.f);
-		configParam(BOTTOM3_PARAM, 0.f, 1.f, 0.f, "Bottom 3", "%", 0.f, 100.f);
-		configParam(BOTTOM4_PARAM, 0.f, 1.f, 0.f, "Bottom 4", "%", 0.f, 100.f);
-		configSwitch(RANGE1_PARAM, 0.f, 2.f, 0.f, "Range 1", {"5vpp", "10vpp", "20vpp"});
-		configSwitch(RANGE2_PARAM, 0.f, 2.f, 0.f, "Range 2",  {"5vpp", "10vpp", "20vpp"});
-		configSwitch(RANGE3_PARAM, 0.f, 2.f, 0.f, "Range 3", {"5vpp", "10vpp", "20vpp"});
-		configSwitch(RANGE4_PARAM, 0.f, 2.f, 0.f, "Range 4", {"5vpp", "10vpp", "20vpp"});
-		configInput(CLK1_INPUT, "Clock 1");
-		configInput(CLK2_INPUT, "Clock 2");
-		configInput(CLK3_INPUT, "Clock 3");
-		configInput(CLK4_INPUT, "Clock 4");
-		configInput(TOPCV1_INPUT, "Top CV 1");
-		configInput(TOPCV2_INPUT, "Top CV 2");
-		configInput(TOPCV3_INPUT, "Top CV 3");
-		configInput(TOPCV4_INPUT, "Top CV 4");
-		configInput(BOTTOMCV1_INPUT, "Bottom CV 1");
-		configInput(BOTTOMCV2_INPUT, "Bottom CV 2");
-		configInput(BOTTOMCV3_INPUT, "Bottom CV 3");
-		configInput(BOTTOMCV4_INPUT, "Bottom CV 4");
-		configOutput(SUMOUT_OUTPUT, "Sum");
-		configOutput(INVSUMOUT_OUTPUT, "Inverse Sum");
-		configOutput(MAXOUT_OUTPUT, "Max");
-		configOutput(MINOUT_OUTPUT, "Min");
-		configOutput(POSOUT_OUTPUT, "Positive");
-		configOutput(NEGOUT_OUTPUT, "Negative");
-		configOutput(FULLOUT_OUTPUT, "Full Wave Rectified");
-		configOutput(INVFULLOUT_OUTPUT, "Inverse Full Wave Rectified");
-		configOutput(OUT1_OUTPUT, "Ch. 1");
-		configOutput(OUT2_OUTPUT, "Ch. 2");
-		configOutput(OUT3_OUTPUT, "Ch. 3");
-		configOutput(OUT4_OUTPUT, "Ch. 4");
-		configOutput(AVGOUT_OUTPUT, "Average");
-		configOutput(SLEWOUT_OUTPUT, "Slew");
-	}
+    enum InputId {
+        // Clock inputs
+        CLK1_INPUT,
+        CLK2_INPUT,
+        CLK3_INPUT,
+        CLK4_INPUT,
+        // Top CV inputs
+        TOPCV1_INPUT,
+        TOPCV2_INPUT,
+        TOPCV3_INPUT,
+        TOPCV4_INPUT,
+        // Bottom CV inputs
+        BOTTOMCV1_INPUT,
+        BOTTOMCV2_INPUT,
+        BOTTOMCV3_INPUT,
+        BOTTOMCV4_INPUT,
+        INPUTS_LEN
+    };
+
+    enum OutputId {
+        // Math outputs
+        SUMOUT_OUTPUT,
+        INVSUMOUT_OUTPUT,
+        MAXOUT_OUTPUT,
+        MINOUT_OUTPUT,
+        POSOUT_OUTPUT,
+        NEGOUT_OUTPUT,
+        FULLOUT_OUTPUT,
+        INVFULLOUT_OUTPUT,
+        // Channel outputs
+        OUT1_OUTPUT,
+        OUT2_OUTPUT,
+        OUT3_OUTPUT,
+        OUT4_OUTPUT,
+        // Additional outputs
+        AVGOUT_OUTPUT,
+        SLEWOUT_OUTPUT,
+        OUTPUTS_LEN
+    };
+
+    enum LightId {
+        // Channel LEDs (red/green pairs)
+        LED1RED_LIGHT,
+        LED1GREEN_LIGHT,
+        LED2RED_LIGHT,
+        LED2GREEN_LIGHT,
+        LED3RED_LIGHT,
+        LED3GREEN_LIGHT,
+        LED4RED_LIGHT,
+        LED4GREEN_LIGHT,
+        // Math LEDs (red/green pairs)
+        SUMLEDRED_LIGHT,
+        SUMLEDGREEN_LIGHT,
+        INVLEDRED_LIGHT,
+        INVLEDGREEN_LIGHT,
+        MAXLEDRED_LIGHT,
+        MAXLEDGREEN_LIGHT,
+        MINLEDRED_LIGHT,
+        MINLEDGREEN_LIGHT,
+        POSLEDRED_LIGHT,
+        POSLEDGREEN_LIGHT,
+        NEGLEDRED_LIGHT,
+        NEGLEDGREEN_LIGHT,
+        FULLLEDRED_LIGHT,
+        FULLLEDGREEN_LIGHT,
+        INVFULLLEDRED_LIGHT,
+        INVFULLLEDGREEN_LIGHT,
+        AVGLEDRED_LIGHT,
+        AVGLEDGREEN_LIGHT,
+        SLEWLEDRED_LIGHT,
+        SLEWLEDGREEN_LIGHT,
+        // Bus LEDs
+        BUS1LED_LIGHT,
+        BUS2LED_LIGHT,
+        BUS3LED_LIGHT,
+        BUS4LED_LIGHT,
+        LIGHTS_LEN
+    };
+QuadDeviant() {
+    config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
+
+    // --- Bus switches ---
+    configSwitch(BUS1_PARAM, 0.f, 1.f, 0.f, "Bus 1");
+    configSwitch(BUS2_PARAM, 0.f, 1.f, 0.f, "Bus 2");
+    configSwitch(BUS3_PARAM, 0.f, 1.f, 0.f, "Bus 3");
+    configSwitch(BUS4_PARAM, 0.f, 1.f, 0.f, "Bus 4");
+
+    // --- Top knobs ---
+    configParam(TOP1_PARAM, 0.f, 1.f, 1.f, "Top 1", "%", 0.f, 100.f);
+    configParam(TOP2_PARAM, 0.f, 1.f, 1.f, "Top 2", "%", 0.f, 100.f);
+    configParam(TOP3_PARAM, 0.f, 1.f, 1.f, "Top 3", "%", 0.f, 100.f);
+    configParam(TOP4_PARAM, 0.f, 1.f, 1.f, "Top 4", "%", 0.f, 100.f);
+
+    // --- Bottom knobs ---
+    configParam(BOTTOM1_PARAM, 0.f, 1.f, 0.f, "Bottom 1", "%", 0.f, 100.f);
+    configParam(BOTTOM2_PARAM, 0.f, 1.f, 0.f, "Bottom 2", "%", 0.f, 100.f);
+    configParam(BOTTOM3_PARAM, 0.f, 1.f, 0.f, "Bottom 3", "%", 0.f, 100.f);
+    configParam(BOTTOM4_PARAM, 0.f, 1.f, 0.f, "Bottom 4", "%", 0.f, 100.f);
+
+    // --- Range switches ---
+    configSwitch(RANGE1_PARAM, 0.f, 2.f, 0.f, "Range 1", {"5vpp", "10vpp", "20vpp"});
+    configSwitch(RANGE2_PARAM, 0.f, 2.f, 0.f, "Range 2", {"5vpp", "10vpp", "20vpp"});
+    configSwitch(RANGE3_PARAM, 0.f, 2.f, 0.f, "Range 3", {"5vpp", "10vpp", "20vpp"});
+    configSwitch(RANGE4_PARAM, 0.f, 2.f, 0.f, "Range 4", {"5vpp", "10vpp", "20vpp"});
+
+    // --- Clock inputs ---
+    configInput(CLK1_INPUT, "Clock 1");
+    configInput(CLK2_INPUT, "Clock 2");
+    configInput(CLK3_INPUT, "Clock 3");
+    configInput(CLK4_INPUT, "Clock 4");
+
+    // --- Top CV inputs ---
+    configInput(TOPCV1_INPUT, "Top CV 1");
+    configInput(TOPCV2_INPUT, "Top CV 2");
+    configInput(TOPCV3_INPUT, "Top CV 3");
+    configInput(TOPCV4_INPUT, "Top CV 4");
+
+    // --- Bottom CV inputs ---
+    configInput(BOTTOMCV1_INPUT, "Bottom CV 1");
+    configInput(BOTTOMCV2_INPUT, "Bottom CV 2");
+    configInput(BOTTOMCV3_INPUT, "Bottom CV 3");
+    configInput(BOTTOMCV4_INPUT, "Bottom CV 4");
+
+    // --- CV Bus outputs ---
+    configOutput(SUMOUT_OUTPUT, "Sum");
+    configOutput(INVSUMOUT_OUTPUT, "Inverse Sum");
+    configOutput(MAXOUT_OUTPUT, "Max");
+    configOutput(MINOUT_OUTPUT, "Min");
+    configOutput(POSOUT_OUTPUT, "Positive");
+    configOutput(NEGOUT_OUTPUT, "Negative");
+    configOutput(FULLOUT_OUTPUT, "Full Wave Rectified");
+    configOutput(INVFULLOUT_OUTPUT, "Inverse Full Wave Rectified");
+    configOutput(AVGOUT_OUTPUT, "Average");
+    configOutput(SLEWOUT_OUTPUT, "Slew");
+
+    // --- Channel outputs ---
+    configOutput(OUT1_OUTPUT, "Ch. 1");
+    configOutput(OUT2_OUTPUT, "Ch. 2");
+    configOutput(OUT3_OUTPUT, "Ch. 3");
+    configOutput(OUT4_OUTPUT, "Ch. 4");
+}
 
 
-// Bus Buttons
+
 dsp::SchmittTrigger busTrigger[4];
-bool busState[4] = {true, true, true,  true};
-float lastBang1Input = 0.0f;
-float lastBang2Input = 0.0f;
-float randomVoltage1 = 0.01f; 
-float randomVoltage2 = 0.01f;
+bool busState[4] = {true, true, true, true};
+float lastBang[4] = {0.f, 0.f, 0.f, 0.f};
+float randomVoltage[4] = {0.01f, 0.01f, 0.01f, 0.01f};
+
+// Rescale helper: 0-1 param -> -5V to 5V
+float paramToVoltage(float p) {
+    return -5.f + p * 10.f;
+}
 
 void onReset() override {
-    // Set all bus buttons to true
-    for (int i = 0; i < 4; i++) {
-        busState[i] = true;
-    }
+    for (int i = 0; i < 4; i++) busState[i] = true;
 }
 
 void onRandomize() override {
+    for (int i = 0; i < 4; i++) busState[i] = (rand() % 2 == 0);
+}
+
+// Range scaling helper
+float rangeScale(float voltage, float rangeParam) {
+    float ranges[3] = {2.5f, 5.f, 10.f};  // ±2.5V, ±5V, ±10V
+    return clamp(voltage * (ranges[(int)rangeParam] / 5.f), -ranges[(int)rangeParam], ranges[(int)rangeParam]);
+}
+
+void process(const ProcessArgs &args) override {
+    // --- Bus buttons ---
     for (int i = 0; i < 4; i++) {
-        busState[i] = (rand() % 2 == 0);
+        if (busTrigger[i].process(params[BUS1_PARAM + i].getValue()))
+            busState[i] = !busState[i];
+
+        lights[BUS1LED_LIGHT + i].setBrightnessSmooth(busState[i] ? 1.f : 0.f, args.sampleTime);
+    }
+
+// --- Channel processing ---
+for (int i = 0; i < 4; i++) {
+    bool bangTriggered = false;
+
+    if (inputs[CLK1_INPUT + i].isConnected()) {
+        float v = inputs[CLK1_INPUT + i].getVoltage();
+        bangTriggered = (v > 0.5f && lastBang[i] <= 0.5f);
+        lastBang[i] = v;
+    }
+
+    if (bangTriggered) {
+        float topValue    = paramToVoltage(params[TOP1_PARAM + i].getValue()) + inputs[TOPCV1_INPUT + i].getVoltage();
+        float bottomValue = paramToVoltage(params[BOTTOM1_PARAM + i].getValue()) + inputs[BOTTOMCV1_INPUT + i].getVoltage();
+        if (bottomValue >= topValue) bottomValue = topValue;
+
+        float rawVoltage = clamp(bottomValue + (topValue - bottomValue) * random::uniform(), -5.f, 5.f);
+        randomVoltage[i] = rangeScale(rawVoltage, params[RANGE1_PARAM + i].getValue());
+
+        outputs[OUT1_OUTPUT + i].setVoltage(randomVoltage[i]);
+
+        // --- LED scaling based on range and polarity ---
+        float ranges[3] = {2.5f, 5.f, 10.f};  // ±2.5V, ±5V, ±10V
+        float currentRange = ranges[(int)params[RANGE1_PARAM + i].getValue()];
+
+        // Red LED for negative voltages
+        float redNormalized = clamp(-std::min(randomVoltage[i], 0.f) / currentRange, 0.f, 1.f);
+        // Green LED for positive voltages
+        float greenNormalized = clamp(std::max(randomVoltage[i], 0.f) / currentRange, 0.f, 1.f);
+
+        int ledBase = LED1RED_LIGHT + i * 2;
+        lights[ledBase].setBrightness(redNormalized);      // Red shows negative
+        lights[ledBase + 1].setBrightness(greenNormalized); // Green shows positive
     }
 }
 
-
-    // Rescale helper: 0-1 param -> -5V to 5V
-    float paramToVoltage(float p) {
-        return -5.f + p * 10.f;
-    }
-
-void process(const ProcessArgs &args) override {
-	//Bus buttons
-    for (int i = 0; i < 4; i++) {
-        int paramId = BUS1_PARAM + i;
-        int lightId = BUS1LED_LIGHT + i;
-
-        if (busTrigger[i].process(params[paramId].getValue())) {
-            busState[i] = !busState[i];
-        }
-
-        lights[lightId].setBrightnessSmooth(busState[i] ? 1.f : 0.f, args.sampleTime);
-    }
-        // Rising edge detection
-        bool bang1Triggered = false;
-        if (inputs[CLK1_INPUT].isConnected()) {
-            float bang1Input = inputs[CLK1_INPUT].getVoltage();
-            if (bang1Input > 0.5f && lastBang1Input <= 0.5f) bang1Triggered = true;
-            lastBang1Input = bang1Input;
-        }
-
-        bool bang2Triggered = false;
-        if (inputs[CLK2_INPUT].isConnected()) {
-            float bang2Input = inputs[CLK2_INPUT].getVoltage();
-            if (bang2Input > 0.5f && lastBang2Input <= 0.5f) bang2Triggered = true;
-            lastBang2Input = bang2Input;
-        }
-
-        // Jack normalizing
-        if (!inputs[CLK2_INPUT].isConnected()) bang2Triggered = bang1Triggered;
-
-        // Bang 1
-        if (bang1Triggered) {
-            float topValue = paramToVoltage(params[TOP1_PARAM].getValue()) + inputs[TOPCV1_INPUT].getVoltage();
-            float bottomValue = paramToVoltage(params[BOTTOM1_PARAM].getValue()) + inputs[BOTTOMCV1_INPUT].getVoltage();
-            if (bottomValue >= topValue) bottomValue = topValue;
-            randomVoltage1 = clamp(bottomValue + (topValue - bottomValue) * random::uniform(), -5.f, 5.f);
-        }
-
-        // Bang 2
-        if (bang2Triggered) {
-            float topValue = paramToVoltage(params[TOP2_PARAM].getValue()) + inputs[TOPCV2_INPUT].getVoltage();
-            float bottomValue = paramToVoltage(params[BOTTOM2_PARAM].getValue()) + inputs[BOTTOMCV2_INPUT].getVoltage();
-            if (bottomValue >= topValue) bottomValue = topValue;
-            randomVoltage2 = clamp(bottomValue + (topValue - bottomValue) * random::uniform(), -5.f, 5.f);
-        }
-
-        // Directly output random voltages
-        outputs[OUT1_OUTPUT].setVoltage(randomVoltage1);
-        outputs[OUT2_OUTPUT].setVoltage(randomVoltage2);
-
-        // LEDs
-        lights[LED1GREEN_LIGHT].setBrightness(clamp(randomVoltage1, 0.f, 5.f) / 5.f);
-        lights[LED1RED_LIGHT].setBrightness(clamp(-randomVoltage1, 0.f, 5.f) / 5.f);
-        lights[LED2GREEN_LIGHT].setBrightness(clamp(randomVoltage2, 0.f, 5.f) / 5.f);
-        lights[LED2RED_LIGHT].setBrightness(clamp(-randomVoltage2, 0.f, 5.f) / 5.f);
 }
 };
 

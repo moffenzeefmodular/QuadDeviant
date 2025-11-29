@@ -223,44 +223,52 @@ void process(const ProcessArgs &args) override {
         if (busTrigger[i].process(params[BUS1_PARAM + i].getValue()))
             busState[i] = !busState[i];
 
-        lights[BUS1LED_LIGHT + i].setBrightnessSmooth(busState[i] ? 1.f : 0.f, args.sampleTime);
+        lights[BUS1LED_LIGHT + i].setBrightness(busState[i] ? 1.f : 0.f);
     }
 
-// --- Channel processing ---
-for (int i = 0; i < 4; i++) {
-    bool bangTriggered = false;
+    float sumVoltage = 0.f;
 
-    if (inputs[CLK1_INPUT + i].isConnected()) {
-        float v = inputs[CLK1_INPUT + i].getVoltage();
+    // --- Clock normalization cascade ---
+    float normalizedClocks[4];
+    bool hasClock = false;
+
+    for (int i = 0; i < 4; i++) {
+        if (inputs[CLK1_INPUT + i].isConnected()) {
+            normalizedClocks[i] = inputs[CLK1_INPUT + i].getVoltage();
+            hasClock = true;
+        } else if (hasClock) {
+            // Normalize from the last connected upstream clock
+            normalizedClocks[i] = normalizedClocks[i - 1];
+        } else {
+            normalizedClocks[i] = 0.f; // no clock connected upstream
+        }
+    }
+
+    // --- Channel processing ---
+    for (int i = 0; i < 4; i++) {
+        bool bangTriggered = false;
+        float v = normalizedClocks[i];
+
         bangTriggered = (v > 0.5f && lastBang[i] <= 0.5f);
         lastBang[i] = v;
+
+        if (bangTriggered) {
+            float topValue    = paramToVoltage(params[TOP1_PARAM + i].getValue()) + inputs[TOPCV1_INPUT + i].getVoltage();
+            float bottomValue = paramToVoltage(params[BOTTOM1_PARAM + i].getValue()) + inputs[BOTTOMCV1_INPUT + i].getVoltage();
+            if (bottomValue >= topValue) bottomValue = topValue;
+
+            float rawVoltage = clamp(bottomValue + (topValue - bottomValue) * random::uniform(), -5.f, 5.f);
+            randomVoltage[i] = rangeScale(rawVoltage, params[RANGE1_PARAM + i].getValue());
+
+            // --- Set CV output ---
+            outputs[OUT1_OUTPUT + i].setVoltage(randomVoltage[i]);
+
+            // --- Rectified LEDs ---
+            int ledBase = LED1RED_LIGHT + i * 2;
+            lights[ledBase].setBrightness(std::max(-randomVoltage[i] / (rangeScale(10.f, params[RANGE1_PARAM + i].getValue())), 0.f));
+            lights[ledBase + 1].setBrightness(std::max(randomVoltage[i] / (rangeScale(10.f, params[RANGE1_PARAM + i].getValue())), 0.f));
+        }
     }
-
-    if (bangTriggered) {
-        float topValue    = paramToVoltage(params[TOP1_PARAM + i].getValue()) + inputs[TOPCV1_INPUT + i].getVoltage();
-        float bottomValue = paramToVoltage(params[BOTTOM1_PARAM + i].getValue()) + inputs[BOTTOMCV1_INPUT + i].getVoltage();
-        if (bottomValue >= topValue) bottomValue = topValue;
-
-        float rawVoltage = clamp(bottomValue + (topValue - bottomValue) * random::uniform(), -5.f, 5.f);
-        randomVoltage[i] = rangeScale(rawVoltage, params[RANGE1_PARAM + i].getValue());
-
-        outputs[OUT1_OUTPUT + i].setVoltage(randomVoltage[i]);
-
-        // --- LED scaling based on range and polarity ---
-        float ranges[3] = {2.5f, 5.f, 10.f};  // ±2.5V, ±5V, ±10V
-        float currentRange = ranges[(int)params[RANGE1_PARAM + i].getValue()];
-
-        // Red LED for negative voltages
-        float redNormalized = clamp(-std::min(randomVoltage[i], 0.f) / currentRange, 0.f, 1.f);
-        // Green LED for positive voltages
-        float greenNormalized = clamp(std::max(randomVoltage[i], 0.f) / currentRange, 0.f, 1.f);
-
-        int ledBase = LED1RED_LIGHT + i * 2;
-        lights[ledBase].setBrightness(redNormalized);      // Red shows negative
-        lights[ledBase + 1].setBrightness(greenNormalized); // Green shows positive
-    }
-}
-
 }
 };
 

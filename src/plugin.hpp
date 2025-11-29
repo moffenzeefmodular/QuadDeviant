@@ -8,6 +8,7 @@ using namespace rack;
 extern Plugin* pluginInstance;
 
 // Declare each Model, defined in each module source file
+extern Model* modelDeviant;
 extern Model* modelQuadDeviant;
 
 struct CKSSHorizontal : app::SvgSwitch {

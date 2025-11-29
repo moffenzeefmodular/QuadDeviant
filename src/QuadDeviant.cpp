@@ -154,7 +154,6 @@ void onRandomize() override {
 
 
 void process(const ProcessArgs &args) override {
-
 	//Bus buttons
     for (int i = 0; i < 4; i++) {
         int paramId = BUS1_PARAM + i;

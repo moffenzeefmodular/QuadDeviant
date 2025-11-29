@@ -8,6 +8,7 @@ void init(Plugin* p) {
 	pluginInstance = p;
 
 	// Add modules here
+	p->addModel(modelDeviant);
 	p->addModel(modelQuadDeviant);
 
 	// Any other plugin initialization may go here.

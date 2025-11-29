@@ -180,8 +180,32 @@ float paramToVoltage(float p) {
 }
 
 void onReset() override {
-    for (int i = 0; i < 4; i++) busState[i] = true;
+    // --- Turn off all LEDs except bus LEDs ---
+    for (int i = 0; i < LIGHTS_LEN; i++) {
+        // Bus LEDs are at the end of the enum
+        if (i < BUS1LED_LIGHT || i > BUS4LED_LIGHT) {
+            lights[i].setBrightness(0.f);
+        }
+    }
+
+    // --- Initialize bus states ---
+    for (int i = 0; i < 4; i++)
+        busState[i] = true;
+
+    // --- Reset lastBang trackers ---
+    for (int i = 0; i < 4; i++)
+        lastBang[i] = 0.f;
+
+    // --- Reset random voltages ---
+    for (int i = 0; i < 4; i++)
+        randomVoltage[i] = 0.0f;
+
+    // --- Set all CV outputs to 0 ---
+    for (int i = 0; i < OUTPUTS_LEN; i++)
+        outputs[i].setVoltage(0.f);
 }
+
+
 
 void onRandomize() override {
     for (int i = 0; i < 4; i++) busState[i] = (rand() % 2 == 0);

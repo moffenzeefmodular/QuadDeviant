@@ -138,6 +138,10 @@ enum ParamId {
 // Bus Buttons
 dsp::SchmittTrigger busTrigger[4];
 bool busState[4] = {true, true, true,  true};
+float lastBang1Input = 0.0f;
+float lastBang2Input = 0.0f;
+float randomVoltage1 = 0.01f; 
+float randomVoltage2 = 0.01f;
 
 void onReset() override {
     // Set all bus buttons to true
@@ -153,6 +157,11 @@ void onRandomize() override {
 }
 
 
+    // Rescale helper: 0-1 param -> -5V to 5V
+    float paramToVoltage(float p) {
+        return -5.f + p * 10.f;
+    }
+
 void process(const ProcessArgs &args) override {
 	//Bus buttons
     for (int i = 0; i < 4; i++) {
@@ -165,8 +174,50 @@ void process(const ProcessArgs &args) override {
 
         lights[lightId].setBrightnessSmooth(busState[i] ? 1.f : 0.f, args.sampleTime);
     }
-}
+        // Rising edge detection
+        bool bang1Triggered = false;
+        if (inputs[CLK1_INPUT].isConnected()) {
+            float bang1Input = inputs[CLK1_INPUT].getVoltage();
+            if (bang1Input > 0.5f && lastBang1Input <= 0.5f) bang1Triggered = true;
+            lastBang1Input = bang1Input;
+        }
 
+        bool bang2Triggered = false;
+        if (inputs[CLK2_INPUT].isConnected()) {
+            float bang2Input = inputs[CLK2_INPUT].getVoltage();
+            if (bang2Input > 0.5f && lastBang2Input <= 0.5f) bang2Triggered = true;
+            lastBang2Input = bang2Input;
+        }
+
+        // Jack normalizing
+        if (!inputs[CLK2_INPUT].isConnected()) bang2Triggered = bang1Triggered;
+
+        // Bang 1
+        if (bang1Triggered) {
+            float topValue = paramToVoltage(params[TOP1_PARAM].getValue()) + inputs[TOPCV1_INPUT].getVoltage();
+            float bottomValue = paramToVoltage(params[BOTTOM1_PARAM].getValue()) + inputs[BOTTOMCV1_INPUT].getVoltage();
+            if (bottomValue >= topValue) bottomValue = topValue;
+            randomVoltage1 = clamp(bottomValue + (topValue - bottomValue) * random::uniform(), -5.f, 5.f);
+        }
+
+        // Bang 2
+        if (bang2Triggered) {
+            float topValue = paramToVoltage(params[TOP2_PARAM].getValue()) + inputs[TOPCV2_INPUT].getVoltage();
+            float bottomValue = paramToVoltage(params[BOTTOM2_PARAM].getValue()) + inputs[BOTTOMCV2_INPUT].getVoltage();
+            if (bottomValue >= topValue) bottomValue = topValue;
+            randomVoltage2 = clamp(bottomValue + (topValue - bottomValue) * random::uniform(), -5.f, 5.f);
+        }
+
+        // Directly output random voltages
+        outputs[OUT1_OUTPUT].setVoltage(randomVoltage1);
+        outputs[OUT2_OUTPUT].setVoltage(randomVoltage2);
+
+        // LEDs
+        lights[LED1GREEN_LIGHT].setBrightness(clamp(randomVoltage1, 0.f, 5.f) / 5.f);
+        lights[LED1RED_LIGHT].setBrightness(clamp(-randomVoltage1, 0.f, 5.f) / 5.f);
+        lights[LED2GREEN_LIGHT].setBrightness(clamp(randomVoltage2, 0.f, 5.f) / 5.f);
+        lights[LED2RED_LIGHT].setBrightness(clamp(-randomVoltage2, 0.f, 5.f) / 5.f);
+}
 };
 
 
@@ -235,17 +286,17 @@ struct QuadDeviantWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(108.324, 113.602)), module, QuadDeviant::AVGOUT_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(121.633, 113.602)), module, QuadDeviant::SLEWOUT_OUTPUT));
 
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(14.664, 14.029)), module, QuadDeviant::LED1RED_LIGHT));
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(14.664, 14.029)), module, QuadDeviant::LED1GREEN_LIGHT));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(11.801, 13.745)), module, QuadDeviant::LED1RED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(17.189, 13.745)), module, QuadDeviant::LED1GREEN_LIGHT));
 
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(39.664, 14.029)), module, QuadDeviant::LED2RED_LIGHT));
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(39.664, 14.029)), module, QuadDeviant::LED2GREEN_LIGHT));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(36.801, 13.745)), module, QuadDeviant::LED2RED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(42.189, 13.745)), module, QuadDeviant::LED2GREEN_LIGHT));
 
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(64.664, 14.029)), module, QuadDeviant::LED3RED_LIGHT));
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(64.664, 14.029)), module, QuadDeviant::LED3GREEN_LIGHT));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(61.801, 13.745)), module, QuadDeviant::LED3RED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(67.190, 13.745)), module, QuadDeviant::LED3GREEN_LIGHT));
 
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(89.664, 14.029)), module, QuadDeviant::LED4RED_LIGHT));
-		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(89.664, 14.029)), module, QuadDeviant::LED4GREEN_LIGHT));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(86.801, 13.745)), module, QuadDeviant::LED4RED_LIGHT));
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(92.189, 13.745)), module, QuadDeviant::LED4GREEN_LIGHT));
 
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(108.324, 38.165)), module, QuadDeviant::SUMLEDRED_LIGHT));
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(108.324, 38.165)), module, QuadDeviant::SUMLEDGREEN_LIGHT));
